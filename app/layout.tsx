@@ -32,3 +32,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+<body className="antialiased" style={{ fontFamily: "Times New Roman, serif" }}></body>

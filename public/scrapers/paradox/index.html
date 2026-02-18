@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Paradox.ai Jobs Scraper</title>
+
+  <style>
+    /* ========= RESET ========= */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      padding: 32px 16px;
+      color: #f9fafb;
+      background:
+        radial-gradient(circle at top, #4f46e5 0, #0f172a 40%, #020617 100%);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1120px;
+    }
+
+    .glass-card {
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.15), rgba(15,23,42,0.95));
+      border-radius: 24px;
+      border: 1px solid rgba(148,163,184,0.5);
+      box-shadow: 0 18px 45px rgba(15,23,42,0.9);
+      backdrop-filter: blur(18px);
+      padding: 24px 26px 28px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(120deg, #a855f7, #38bdf8, #f97316);
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #cbd5f5;
+      margin-bottom: 18px;
+    }
+
+    /* ========= LAYOUT ========= */
+    .sections-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 960px) {
+      .sections-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .section {
+      border-radius: 18px;
+      padding: 14px 14px 16px;
+      margin-bottom: 14px;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid rgba(55,65,81,0.9);
+      box-shadow: 0 12px 28px rgba(15,23,42,0.85);
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #a5b4fc;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .field { margin-bottom: 10px; }
+
+    label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #9ca3af;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    small {
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+
+    .export-modal {
+     position: fixed;
+     inset: 0;
+     background: rgba(0,0,0,0.55);
+     backdrop-filter: blur(8px);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     z-index: 999;
+    }
+
+    .export-modal.hidden {
+     display: none;
+    }
+
+   .export-card {
+     width: 520px;
+     max-height: 70vh;
+     background: var(--card);
+     border: 1px solid var(--border);
+     border-radius: 16px;
+     padding: 18px;
+      display: flex;
+     flex-direction: column;
+    }
+
+   .export-header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+    }
+
+   .export-header h3 {
+     margin: 0;
+    }
+
+    .export-body {
+      margin-top: 12px;
+     overflow-y: auto;
+    }
+
+    .field-list {
+      margin-top: 10px;
+     display: flex;
+     flex-direction: column;
+     gap: 6px;
+    }
+
+    .field-list label {
+     font-size: 0.8rem;
+      display: flex;
+     gap: 8px;
+     align-items: center;
+    }
+
+    .export-actions {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.95);
+      color: #e5e7eb;
+      font-size: 0.9rem;
+    }
+
+    textarea {
+      border-radius: 14px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #a855f7;
+      box-shadow: 0 0 0 1px rgba(168,85,247,0.9),
+                  0 0 0 9px rgba(76,29,149,0.45);
+    }
+
+    /* ========= CHECKBOX ========= */
+    .inline-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
+
+    /* ========= CHIPS ========= */
+    .filter-card {
+      border-radius: 14px;
+      padding: 10px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(75,85,99,0.9);
+      margin-bottom: 10px;
+    }
+
+    .chips-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .chips-header label {
+      font-size: 0.75rem;
+      color: #a5b4fc;
+    }
+
+    .chips-clear {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 28px;
+    }
+
+    .chip {
+      background: linear-gradient(135deg, #4c1d95, #1d4ed8);
+      color: #fff;
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .chip-remove {
+      background: transparent;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+
+    /* ========= BUTTONS ========= */
+    .button-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #4f46e5, #ec4899);
+      color: #fff;
+      font-size: 0.9rem;
+      box-shadow: 0 12px 26px rgba(79,70,229,0.7);
+    }
+
+    button:disabled { opacity: 0.6; }
+
+    /* ========= RESULTS ========= */
+    #results { margin-top: 20px; }
+
+    .job-card {
+      background: rgba(15,23,42,0.95);
+      border-radius: 16px;
+      padding: 12px;
+      border: 1px solid rgba(55,65,81,0.9);
+      margin-bottom: 10px;
+    }
+
+    .job-title { font-weight: 600; margin-bottom: 4px; }
+
+    .job-meta {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+
+    .pill {
+      background: linear-gradient(135deg, #4f46e5, #a855f7);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      margin-right: 4px;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+
+    <div class="app-shell fade-in">
+    <div class="back-link-wrap">
+      <a href="/" class="back-link">
+        ⬅ Back to dashboard
+      </a>
+    </div>
+
+  <div class="app-shell">
+    <div class="glass-card">
+      <h1>Paradox.ai Jobs Scraper</h1>
+      <p class="subtitle">Search Paradox-powered job boards with AI enrichment and export results.</p>
+
+
+  <form id="paradox-form">
+    <!-- Basic -->
+    <div class="section">
+      <div class="section-title">Basic</div>
+
+      <div class="field">
+        <label for="maxJobs">Maximum jobs</label>
+        <input
+          type="number"
+          id="maxJobs"
+          name="maxJobs"
+          min="200"
+          max="5000"
+          value="200"
+        />
+        <small>Must be between 200 and 5,000 (<code>maxJobs</code>).</small>
+      </div>
+
+      <div class="inline-checkbox">
+        <input type="checkbox" id="includeAi" name="includeAi" checked />
+        <label for="includeAi">Include AI fields (<code>includeAi</code>)</label>
+      </div>
+
+      <div class="inline-checkbox">
+        <input type="checkbox" id="includeLinkedIn" name="includeLinkedIn" />
+        <label for="includeLinkedIn">Include LinkedIn company data (<code>includeLinkedIn</code>)</label>
+      </div>
+    </div>
+
+    <!-- Search Parameters -->
+    <div class="section">
+      <div class="section-title">Search parameters (comma-separated → arrays)</div>
+
+      <div class="field">
+        <label for="titleSearch">Title search</label>
+        <input
+          type="text"
+          id="titleSearch"
+          name="titleSearch"
+          placeholder="e.g. Software Engineer, Data Scientist"
+        />
+        <small><code>titleSearch</code> – job title keywords.</small>
+      </div>
+
+      <div class="field">
+        <label for="titleExclusionSearch">Title exclusion</label>
+        <input
+          type="text"
+          id="titleExclusionSearch"
+          name="titleExclusionSearch"
+          placeholder="e.g. Senior, Lead"
+        />
+        <small><code>titleExclusionSearch</code> – job titles to exclude.</small>
+      </div>
+
+      <div class="field">
+        <label for="locationSearch">Location search</label>
+        <input
+          type="text"
+          id="locationSearch"
+          name="locationSearch"
+          placeholder="e.g. United States, India, Remote"
+        />
+        <small><code>locationSearch</code> – job locations (no abbreviations like "US" or "NY").</small>
+      </div>
+
+      <div class="field">
+        <label for="locationExclusionSearch">Location exclusion</label>
+        <input
+          type="text"
+          id="locationExclusionSearch"
+          name="locationExclusionSearch"
+          placeholder="e.g. United States"
+        />
+        <small><code>locationExclusionSearch</code> – locations to exclude.</small>
+      </div>
+
+      <div class="field">
+        <label for="descriptionSearch">Description search</label>
+        <input
+          type="text"
+          id="descriptionSearch"
+          name="descriptionSearch"
+          placeholder="e.g. Python, Machine Learning"
+        />
+        <small>
+          <code>descriptionSearch</code> – title+description keywords (expensive, combine with other filters).
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="descriptionExclusionSearch">Description exclusion</label>
+        <input
+          type="text"
+          id="descriptionExclusionSearch"
+          name="descriptionExclusionSearch"
+          placeholder="e.g. PHP, .NET"
+        />
+        <small><code>descriptionExclusionSearch</code> – exclude if title/description contains these.</small>
+      </div>
+
+      <div class="field">
+        <label for="organizationSearch">Organization search</label>
+        <input
+          type="text"
+          id="organizationSearch"
+          name="organizationSearch"
+          placeholder="e.g. Google, Microsoft"
+        />
+        <small><code>organizationSearch</code> – organization name keywords.</small>
+      </div>
+
+      <div class="field">
+        <label for="organizationExclusionSearch">Organization exclusion</label>
+        <input
+          type="text"
+          id="organizationExclusionSearch"
+          name="organizationExclusionSearch"
+          placeholder="e.g. Infosys, TCS"
+        />
+        <small><code>organizationExclusionSearch</code> – organizations to exclude.</small>
+      </div>
+    </div>
+
+    <!-- Domain filters -->
+    <div class="section">
+      <div class="section-title">Domain filters</div>
+
+      <div class="field">
+        <label for="domainFilter">Domain filter</label>
+        <input
+          type="text"
+          id="domainFilter"
+          name="domainFilter"
+          placeholder="e.g. google.com, microsoft.com"
+        />
+        <small><code>domainFilter</code> – exact company domains to include.</small>
+      </div>
+
+      <div class="field">
+        <label for="domainExclusionFilter">Domain exclusion filter</label>
+        <input
+          type="text"
+          id="domainExclusionFilter"
+          name="domainExclusionFilter"
+          placeholder="e.g. indeed.com, example.com"
+        />
+        <small><code>domainExclusionFilter</code> – exact company domains to exclude.</small>
+      </div>
+    </div>
+
+    <!-- Description & Remote / Agency -->
+    <div class="section">
+      <div class="section-title">Description & Remote / Agency</div>
+
+      <div class="field">
+        <label for="descriptionType">Description type</label>
+        <select id="descriptionType" name="descriptionType">
+          <option value="">None</option>
+          <option value="text" selected>Text</option>
+          <option value="html">HTML</option>
+        </select>
+        <small><code>descriptionType</code> – leave empty to skip description.</small>
+      </div>
+
+      <div class="inline-checkbox">
+        <input type="checkbox" id="remote" name="remote" />
+        <label for="remote">Remote only (<code>remote</code>)</label>
+      </div>
+
+      <div class="inline-checkbox">
+        <input type="checkbox" id="removeAgency" name="removeAgency" />
+        <label for="removeAgency">Remove agency / job board jobs (<code>removeAgency</code>)</label>
+      </div>
+    </div>
+
+    <!-- AI Filters -->
+    <div class="section">
+      <div class="section-title">AI filters</div>
+
+      <!-- AI Employment Type -->
+      <div class="field filter-card">
+        <div class="chips-header">
+          <label for="aiEmploymentTypePicker">AI employment type</label>
+          <button
+            type="button"
+            class="chips-clear"
+            data-target-input="aiEmploymentTypeFilter"
+            data-target-chips="aiEmploymentTypeChips"
+          >
+            Clear all
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <select id="aiEmploymentTypePicker">
+            <option value="">Select type...</option>
+            <option value="FULL_TIME">FULL_TIME</option>
+            <option value="PART_TIME">PART_TIME</option>
+            <option value="CONTRACTOR">CONTRACTOR</option>
+            <option value="TEMPORARY">TEMPORARY</option>
+            <option value="INTERN">INTERN</option>
+            <option value="VOLUNTEER">VOLUNTEER</option>
+            <option value="PER_DIEM">PER_DIEM</option>
+            <option value="OTHER">OTHER</option>
+          </select>
+          <div id="aiEmploymentTypeChips" class="chips-container"></div>
+          <input type="hidden" id="aiEmploymentTypeFilter" name="aiEmploymentTypeFilter" />
+          <small>Sent as comma-separated list to <code>aiEmploymentTypeFilter</code>.</small>
+        </div>
+      </div>
+
+      <!-- AI Work Arrangement -->
+      <div class="field filter-card">
+        <div class="chips-header">
+          <label for="aiWorkArrangementPicker">AI work arrangement</label>
+          <button
+            type="button"
+            class="chips-clear"
+            data-target-input="aiWorkArrangementFilter"
+            data-target-chips="aiWorkArrangementChips"
+          >
+            Clear all
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <select id="aiWorkArrangementPicker">
+            <option value="">Select arrangement...</option>
+            <option value="On-site">On-site</option>
+            <option value="Hybrid">Hybrid</option>
+            <option value="Remote OK">Remote OK</option>
+            <option value="Remote Solely">Remote Solely</option>
+          </select>
+          <div id="aiWorkArrangementChips" class="chips-container"></div>
+          <input type="hidden" id="aiWorkArrangementFilter" name="aiWorkArrangementFilter" />
+        </div>
+      </div>
+
+      <!-- AI Experience Level -->
+      <div class="field filter-card">
+        <div class="chips-header">
+          <label for="aiExperienceLevelPicker">AI experience level</label>
+          <button
+            type="button"
+            class="chips-clear"
+            data-target-input="aiExperienceLevelFilter"
+            data-target-chips="aiExperienceLevelChips"
+          >
+            Clear all
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <select id="aiExperienceLevelPicker">
+            <option value="">Select range...</option>
+            <option value="0-2">0–2 years</option>
+            <option value="2-5">2–5 years</option>
+            <option value="5-10">5–10 years</option>
+            <option value="10+">10+ years</option>
+          </select>
+          <div id="aiExperienceLevelChips" class="chips-container"></div>
+          <input type="hidden" id="aiExperienceLevelFilter" name="aiExperienceLevelFilter" />
+        </div>
+      </div>
+
+      <div class="inline-checkbox">
+        <input type="checkbox" id="aiHasSalary" name="aiHasSalary" />
+        <label for="aiHasSalary">Only jobs with salary (<code>aiHasSalary</code>)</label>
+      </div>
+
+      <div class="inline-checkbox">
+        <input type="checkbox" id="aiVisaSponsorshipFilter" name="aiVisaSponsorshipFilter" />
+        <label for="aiVisaSponsorshipFilter">Visa sponsorship only (<code>aiVisaSponsorshipFilter</code>)</label>
+      </div>
+
+      <!-- AI Taxonomies Filter -->
+      <div class="field filter-card">
+        <div class="chips-header">
+          <label for="aiTaxonomiesPicker">AI taxonomies filter</label>
+          <button
+            type="button"
+            class="chips-clear"
+            data-target-input="aiTaxonomiesFilter"
+            data-target-chips="aiTaxonomiesChips"
+          >
+            Clear all
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <select id="aiTaxonomiesPicker">
+            <option value="">Select taxonomy...</option>
+            <option value="Technology">Technology</option>
+            <option value="Software">Software</option>
+            <option value="Data & Analytics">Data & Analytics</option>
+            <option value="Finance & Accounting">Finance & Accounting</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Human Resources">Human Resources</option>
+            <option value="Sales">Sales</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Customer Service & Support">Customer Service & Support</option>
+            <option value="Education">Education</option>
+            <option value="Legal">Legal</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Science & Research">Science & Research</option>
+            <option value="Trades">Trades</option>
+            <option value="Construction">Construction</option>
+            <option value="Manufacturing">Manufacturing</option>
+            <option value="Logistics">Logistics</option>
+            <option value="Creative & Media">Creative & Media</option>
+            <option value="Hospitality">Hospitality</option>
+            <option value="Environmental & Sustainability">Environmental & Sustainability</option>
+            <option value="Retail">Retail</option>
+            <option value="Energy">Energy</option>
+            <option value="Agriculture">Agriculture</option>
+            <option value="Social Services">Social Services</option>
+            <option value="Administrative">Administrative</option>
+            <option value="Government & Public Sector">Government & Public Sector</option>
+            <option value="Art & Design">Art & Design</option>
+            <option value="Food & Beverage">Food & Beverage</option>
+            <option value="Transportation">Transportation</option>
+            <option value="Consulting">Consulting</option>
+            <option value="Sports & Recreation">Sports & Recreation</option>
+            <option value="Security & Safety">Security & Safety</option>
+          </select>
+          <div id="aiTaxonomiesChips" class="chips-container"></div>
+          <input type="hidden" id="aiTaxonomiesFilter" name="aiTaxonomiesFilter" />
+        </div>
+      </div>
+
+      <!-- AI Primary Taxonomies -->
+      <div class="field filter-card">
+        <div class="chips-header">
+          <label for="aiTaxonomiesPrimaryPicker">AI primary taxonomies</label>
+          <button
+            type="button"
+            class="chips-clear"
+            data-target-input="aiTaxonomiesPrimaryFilter"
+            data-target-chips="aiTaxonomiesPrimaryChips"
+          >
+            Clear all
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <select id="aiTaxonomiesPrimaryPicker">
+            <option value="">Select primary taxonomy...</option>
+            <!-- same list -->
+            <option value="Technology">Technology</option>
+            <option value="Software">Software</option>
+            <option value="Data & Analytics">Data & Analytics</option>
+            <option value="Finance & Accounting">Finance & Accounting</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Human Resources">Human Resources</option>
+            <option value="Sales">Sales</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Customer Service & Support">Customer Service & Support</option>
+            <option value="Education">Education</option>
+            <option value="Legal">Legal</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Science & Research">Science & Research</option>
+            <option value="Trades">Trades</option>
+            <option value="Construction">Construction</option>
+            <option value="Manufacturing">Manufacturing</option>
+            <option value="Logistics">Logistics</option>
+            <option value="Creative & Media">Creative & Media</option>
+            <option value="Hospitality">Hospitality</option>
+            <option value="Environmental & Sustainability">Environmental & Sustainability</option>
+            <option value="Retail">Retail</option>
+            <option value="Energy">Energy</option>
+            <option value="Agriculture">Agriculture</option>
+            <option value="Social Services">Social Services</option>
+            <option value="Administrative">Administrative</option>
+            <option value="Government & Public Sector">Government & Public Sector</option>
+            <option value="Art & Design">Art & Design</option>
+            <option value="Food & Beverage">Food & Beverage</option>
+            <option value="Transportation">Transportation</option>
+            <option value="Consulting">Consulting</option>
+            <option value="Sports & Recreation">Sports & Recreation</option>
+            <option value="Security & Safety">Security & Safety</option>
+          </select>
+          <div id="aiTaxonomiesPrimaryChips" class="chips-container"></div>
+          <input type="hidden" id="aiTaxonomiesPrimaryFilter" name="aiTaxonomiesPrimaryFilter" />
+        </div>
+      </div>
+
+      <!-- AI Taxonomies Exclusion -->
+      <div class="field filter-card">
+        <div class="chips-header">
+          <label for="aiTaxonomiesExclusionPicker">AI taxonomies exclusion</label>
+          <button
+            type="button"
+            class="chips-clear"
+            data-target-input="aiTaxonomiesExclusionFilter"
+            data-target-chips="aiTaxonomiesExclusionChips"
+          >
+            Clear all
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <select id="aiTaxonomiesExclusionPicker">
+            <option value="">Select taxonomy to exclude...</option>
+            <!-- same list -->
+            <option value="Technology">Technology</option>
+            <option value="Software">Software</option>
+            <option value="Data & Analytics">Data & Analytics</option>
+            <option value="Finance & Accounting">Finance & Accounting</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Human Resources">Human Resources</option>
+            <option value="Sales">Sales</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Customer Service & Support">Customer Service & Support</option>
+            <option value="Education">Education</option>
+            <option value="Legal">Legal</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Science & Research">Science & Research</option>
+            <option value="Trades">Trades</option>
+            <option value="Construction">Construction</option>
+            <option value="Manufacturing">Manufacturing</option>
+            <option value="Logistics">Logistics</option>
+            <option value="Creative & Media">Creative & Media</option>
+            <option value="Hospitality">Hospitality</option>
+            <option value="Environmental & Sustainability">Environmental & Sustainability</option>
+            <option value="Retail">Retail</option>
+            <option value="Energy">Energy</option>
+            <option value="Agriculture">Agriculture</option>
+            <option value="Social Services">Social Services</option>
+            <option value="Administrative">Administrative</option>
+            <option value="Government & Public Sector">Government & Public Sector</option>
+            <option value="Art & Design">Art & Design</option>
+            <option value="Food & Beverage">Food & Beverage</option>
+            <option value="Transportation">Transportation</option>
+            <option value="Consulting">Consulting</option>
+            <option value="Sports & Recreation">Sports & Recreation</option>
+            <option value="Security & Safety">Security & Safety</option>
+          </select>
+          <div id="aiTaxonomiesExclusionChips" class="chips-container"></div>
+          <input
+            type="hidden"
+            id="aiTaxonomiesExclusionFilter"
+            name="aiTaxonomiesExclusionFilter"
+          />
+          <small>Warning: this filter is very broad.</small>
+        </div>
+      </div>
+
+      <div class="inline-checkbox">
+        <input
+          type="checkbox"
+          id="populateAiRemoteLocation"
+          name="populateAiRemoteLocation"
+        />
+        <label for="populateAiRemoteLocation">
+          Populate AI remote location (<code>populateAiRemoteLocation</code>)
+        </label>
+      </div>
+
+      <div class="inline-checkbox">
+        <input
+          type="checkbox"
+          id="populateAiRemoteLocationDerived"
+          name="populateAiRemoteLocationDerived"
+        />
+        <label for="populateAiRemoteLocationDerived">
+          Populate AI remote location (derived) (<code>populateAiRemoteLocationDerived</code>)
+        </label>
+      </div>
+    </div>
+
+    <!-- LinkedIn Filters -->
+    <div class="section">
+      <div class="section-title">LinkedIn filters</div>
+
+      <div class="field">
+        <label for="liIndustryFilter">LinkedIn industries</label>
+        <input
+          type="text"
+          id="liIndustryFilter"
+          name="liIndustryFilter"
+          placeholder="e.g. Information Technology & Services, Internet"
+        />
+        <small><code>liIndustryFilter</code> – comma-separated list.</small>
+      </div>
+
+      <div class="field">
+        <label for="liOrganizationEmployeesGte">Min company size</label>
+        <input
+          type="number"
+          id="liOrganizationEmployeesGte"
+          name="liOrganizationEmployeesGte"
+          placeholder="e.g. 50"
+          min="0"
+        />
+      </div>
+
+      <div class="field">
+        <label for="liOrganizationEmployeesLte">Max company size</label>
+        <input
+          type="number"
+          id="liOrganizationEmployeesLte"
+          name="liOrganizationEmployeesLte"
+          placeholder="e.g. 1000"
+          min="0"
+        />
+      </div>
+    </div>
+
+    <button type="submit" id="run-btn">Run Search</button>
+    <button type="button" id="export-btn" style="margin-left: 8px;" disabled>Export CSV</button>
+    <span id="status" style="margin-left: 10px; font-size: 0.9rem;"></span>
+  </form>
+
+  <div id="exportModal" class="export-modal hidden">
+      <div class="export-card">
+           <div class="export-header">
+             <h3>Export dataset</h3>
+             <button id="closeExport">✕</button>
+           </div>
+
+         <div class="export-body">
+           <label class="checkbox">
+           <input type="checkbox" id="selectAllFields" checked />
+             Export all fields
+            </label>
+
+            <div id="fieldList" class="field-list"></div>
+          </div>
+
+         <div class="export-actions">
+           <button id="confirmExport" class="primary">Export CSV</button>
+         </div>
+     </div>
+    </div>
+
+  <div id="results"></div>
+
+  <script>
+    const form = document.getElementById('paradox-form');
+    const statusEl = document.getElementById('status');
+    const resultsEl = document.getElementById('results');
+    const runBtn = document.getElementById('run-btn');
+    const exportBtn = document.getElementById('export-btn');
+    let lastResults = [];
+
+    // Generic chips helper
+    function linkPickerToChips(pickerId, hiddenInputId, chipsContainerId) {
+      const picker = document.getElementById(pickerId);
+      const hiddenInput = document.getElementById(hiddenInputId);
+      const chipsContainer = document.getElementById(chipsContainerId);
+      if (!picker || !hiddenInput || !chipsContainer) return;
+
+      const getValues = () =>
+        hiddenInput.value
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+      const setValues = (values) => {
+        hiddenInput.value = values.join(', ');
+        chipsContainer.innerHTML = '';
+        values.forEach((val) => {
+          const chip = document.createElement('span');
+          chip.className = 'chip';
+          chip.dataset.value = val;
+          chip.innerHTML = `
+            <span class="chip-label">${val}</span>
+            <button type="button" class="chip-remove">&times;</button>
+          `;
+          chipsContainer.appendChild(chip);
+        });
+      };
+
+      picker.addEventListener('change', () => {
+        const val = picker.value;
+        if (!val) return;
+        const values = getValues();
+        if (!values.includes(val)) {
+          values.push(val);
+          setValues(values);
+        }
+        picker.value = '';
+      });
+
+      chipsContainer.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('chip-remove')) return;
+        const chipEl = e.target.closest('.chip');
+        if (!chipEl) return;
+        const value = chipEl.dataset.value;
+        let values = getValues();
+        values = values.filter((v) => v !== value);
+        setValues(values);
+      });
+    }
+
+    // Wire up all AI pickers
+    linkPickerToChips('aiEmploymentTypePicker', 'aiEmploymentTypeFilter', 'aiEmploymentTypeChips');
+    linkPickerToChips('aiWorkArrangementPicker', 'aiWorkArrangementFilter', 'aiWorkArrangementChips');
+    linkPickerToChips('aiExperienceLevelPicker', 'aiExperienceLevelFilter', 'aiExperienceLevelChips');
+    linkPickerToChips('aiTaxonomiesPicker', 'aiTaxonomiesFilter', 'aiTaxonomiesChips');
+    linkPickerToChips('aiTaxonomiesPrimaryPicker', 'aiTaxonomiesPrimaryFilter', 'aiTaxonomiesPrimaryChips');
+    linkPickerToChips('aiTaxonomiesExclusionPicker', 'aiTaxonomiesExclusionFilter', 'aiTaxonomiesExclusionChips');
+
+    // Clear all chips buttons
+    document.querySelectorAll('.chips-clear').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const inputId = btn.dataset.targetInput;
+        const chipsId = btn.dataset.targetChips;
+        const hiddenInput = document.getElementById(inputId);
+        const chipsContainer = document.getElementById(chipsId);
+        if (!hiddenInput || !chipsContainer) return;
+        hiddenInput.value = '';
+        chipsContainer.innerHTML = '';
+      });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.textContent = 'Running actor...';
+      runBtn.disabled = true;
+      resultsEl.innerHTML = '';
+      exportBtn.disabled = true;
+      lastResults = [];
+
+      const formData = new FormData(form);
+      const raw = {};
+      for (const [key, value] of formData.entries()) {
+        raw[key] = value;
+      }
+
+      const body = {};
+
+      // Simple scalar fields
+      if (raw.descriptionType) body.descriptionType = raw.descriptionType;
+
+      // Numeric fields
+      if (raw.maxJobs) body.maxJobs = Number(raw.maxJobs);
+      if (raw.liOrganizationEmployeesGte) {
+        body.liOrganizationEmployeesGte = Number(raw.liOrganizationEmployeesGte);
+      }
+      if (raw.liOrganizationEmployeesLte) {
+        body.liOrganizationEmployeesLte = Number(raw.liOrganizationEmployeesLte);
+      }
+
+      // Boolean checkboxes (true only if checked)
+      [
+        'includeAi',
+        'includeLinkedIn',
+        'remote',
+        'removeAgency',
+        'aiHasSalary',
+        'aiVisaSponsorshipFilter',
+        'populateAiRemoteLocation',
+        'populateAiRemoteLocationDerived'
+      ].forEach((name) => {
+        const el = form.elements[name];
+        if (el && el.checked) body[name] = true;
+      });
+
+      // Fields that are arrays (comma-separated)
+      const arrayFields = [
+        'titleSearch',
+        'titleExclusionSearch',
+        'locationSearch',
+        'locationExclusionSearch',
+        'descriptionSearch',
+        'descriptionExclusionSearch',
+        'organizationSearch',
+        'organizationExclusionSearch',
+        'domainFilter',
+        'domainExclusionFilter',
+        'aiEmploymentTypeFilter',
+        'aiWorkArrangementFilter',
+        'aiExperienceLevelFilter',
+        'aiTaxonomiesFilter',
+        'aiTaxonomiesPrimaryFilter',
+        'aiTaxonomiesExclusionFilter',
+        'liIndustryFilter'
+      ];
+
+      arrayFields.forEach((field) => {
+        const val = raw[field];
+        if (!val) return;
+        const arr = val
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
+        if (arr.length) body[field] = arr;
+      });
+
+      try {
+        const res = await fetch("/api/run", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+  scraper: "paradox",
+  input: body
+})
+});
+
+const data = await res.json(); // ✅ READ ONCE ONLY
+
+console.log("BACKEND RESPONSE:", data);
+
+if (!res.ok) {
+  throw new Error(data.error || "Backend failed");
+}
+
+
+        if (!res.ok) {
+          let errText = '';
+          try {
+            const errJson = await res.json();
+            errText = errJson.error || JSON.stringify(errJson);
+          } catch {
+            errText = await res.text();
+          }
+          statusEl.textContent = 'Error running actor';
+          resultsEl.textContent = errText || 'Unknown error from server.';
+          console.error(errText);
+          exportBtn.disabled = true;
+          runBtn.disabled = false;
+          return;
+        }
+
+        
+        const items = Array.isArray(data) ? data : (data.items || []);
+
+        if (!Array.isArray(data) && data.status && data.status !== 'SUCCEEDED') {
+          statusEl.textContent = 'Run status: ' + data.status + ' (check Apify console)';
+          exportBtn.disabled = true;
+          runBtn.disabled = false;
+          return;
+        }
+
+        statusEl.textContent = `Found ${items.length} jobs`;
+        lastResults = items;
+        exportBtn.disabled = items.length === 0;
+        renderResults(items);
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'Error calling backend';
+        exportBtn.disabled = true;
+      } finally {
+        runBtn.disabled = false;
+      }
+    });
+
+    function renderResults(items) {
+      if (!items.length) {
+        resultsEl.textContent = 'No jobs returned.';
+        exportBtn.disabled = true;
+        return;
+      }
+
+      resultsEl.innerHTML = '<h2>Results</h2>';
+      items.forEach((job) => {
+        const card = document.createElement('div');
+        card.className = 'job-card';
+
+        const title = document.createElement('div');
+        title.className = 'job-title';
+        title.textContent = job.title || 'Untitled job';
+
+        const meta = document.createElement('div');
+        meta.className = 'job-meta';
+        const org = job.organization || 'Unknown company';
+        const loc =
+          (job.locations_derived && job.locations_derived.join(', ')) ||
+          (job.countries_derived && job.countries_derived.join(', ')) ||
+          '';
+        meta.textContent = org + (loc ? ' • ' + loc : '');
+
+        const tags = document.createElement('div');
+        if (job.employment_type && job.employment_type.length) {
+          job.employment_type.forEach((t) => {
+            const pill = document.createElement('span');
+            pill.className = 'pill';
+            pill.textContent = t;
+            tags.appendChild(pill);
+          });
+        }
+        if (job.ai_experience_level) {
+          const pill = document.createElement('span');
+          pill.className = 'pill';
+          pill.textContent = job.ai_experience_level;
+          tags.appendChild(pill);
+        }
+
+        const linkDiv = document.createElement('div');
+        linkDiv.className = 'job-link';
+        if (job.url) {
+          const a = document.createElement('a');
+          a.href = job.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.textContent = 'View job';
+          linkDiv.appendChild(a);
+        }
+
+        card.appendChild(title);
+        card.appendChild(meta);
+        card.appendChild(tags);
+        card.appendChild(linkDiv);
+
+        resultsEl.appendChild(card);
+      });
+    }
+
+    exportBtn.addEventListener('click', () => {
+      if (!lastResults.length) {
+        statusEl.textContent = 'No results to export.';
+        return;
+      }
+
+      const headers = Array.from(
+        lastResults.reduce((set, item) => {
+          Object.keys(item || {}).forEach((key) => set.add(key));
+          return set;
+        }, new Set())
+      );
+
+      const escapeCsv = (value) => {
+        if (value === null || value === undefined) return '';
+        const str = Array.isArray(value) ? value.join('; ') : String(value);
+        const needsQuotes = /[",\n\r]/.test(str);
+        const escaped = str.replace(/"/g, '""');
+        return needsQuotes ? `"${escaped}"` : escaped;
+      };
+
+      const rows = [
+        headers.map(escapeCsv).join(','),
+        ...lastResults.map((item) =>
+          headers.map((h) => escapeCsv(item ? item[h] : '')).join(',')
+        )
+      ];
+
+      const csv = rows.join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'paradox-jobs.csv';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+
+    const exportModal = document.getElementById('exportModal');
+const fieldList = document.getElementById('fieldList');
+const selectAllCheckbox = document.getElementById('selectAllFields');
+const confirmExportBtn = document.getElementById('confirmExport');
+const closeExportBtn = document.getElementById('closeExport');
+
+let selectedFields = [];
+
+/* Open modal */
+exportBtn.onclick = () => {
+  if (!lastItems.length) return;
+
+  exportModal.classList.remove('hidden');
+
+  const allFields = Array.from(
+    new Set(lastItems.flatMap(item => Object.keys(item)))
+  ).sort();
+
+  fieldList.innerHTML = '';
+  selectedFields = [...allFields];
+
+  allFields.forEach(field => {
+    const label = document.createElement('label');
+    label.innerHTML = `
+      <input type="checkbox" value="${field}" checked />
+      ${field}
+    `;
+    fieldList.appendChild(label);
+  });
+
+  selectAllCheckbox.checked = true;
+};
+
+/* Select all toggle */
+selectAllCheckbox.onchange = () => {
+  const checkboxes = fieldList.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+};
+
+/* Close modal */
+closeExportBtn.onclick = () => {
+  exportModal.classList.add('hidden');
+};
+
+/* Confirm export */
+confirmExportBtn.onclick = () => {
+  const checked = [...fieldList.querySelectorAll('input:checked')]
+    .map(cb => cb.value);
+
+  const fieldsToExport = checked.length ? checked : selectedFields;
+
+  downloadCSV(lastItems, fieldsToExport);
+  exportModal.classList.add('hidden');
+};
+
+function downloadCSV(items, fields) {
+  if (!items.length || !fields.length) {
+    alert("No data or fields selected");
+    return;
+  }
+
+  const rows = [
+    fields.join(','),
+
+    ...items.map(item =>
+      fields.map(field =>
+        `"${String(item[field] ?? '').replace(/"/g, '""')}"`
+      ).join(',')
+    )
+  ];
+
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'export.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  URL.revokeObjectURL(url);
+}
+  </script>
+</body>
+</html>

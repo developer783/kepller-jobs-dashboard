@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Career Site Job Listing API</title>
+
+<style>
+:root {
+  --bg1: #0f102a;
+  --bg2: #2b2d6e;
+  --card: rgba(18, 22, 52, 0.88);
+  --border: rgba(255,255,255,0.14);
+  --text: #e5e7eb;
+  --muted: #a5b4fc;
+  --accent: #8b5cf6;
+  --accent2: #6366f1;
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+  background:
+    radial-gradient(1200px 600px at top, #3b3ea8, transparent),
+    linear-gradient(180deg, var(--bg2), var(--bg1));
+  color: var(--text);
+  padding: 60px 16px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+.header {
+  margin-bottom: 30px;
+}
+
+h1 {
+  font-size: 1.9rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(90deg, #c084fc, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* Cards */
+.section {
+  background: var(--card);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+
+.section-title {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.field {
+  margin-bottom: 14px;
+}
+
+label {
+  font-size: 0.75rem;
+  color: #c7d2fe;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.export-modal {
+     position: fixed;
+     inset: 0;
+     background: rgba(0,0,0,0.55);
+     backdrop-filter: blur(8px);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     z-index: 999;
+    }
+
+    .export-modal.hidden {
+     display: none;
+    }
+
+   .export-card {
+     width: 520px;
+     max-height: 70vh;
+     background: var(--card);
+     border: 1px solid var(--border);
+     border-radius: 16px;
+     padding: 18px;
+      display: flex;
+     flex-direction: column;
+    }
+
+   .export-header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+    }
+
+   .export-header h3 {
+     margin: 0;
+    }
+
+    .export-body {
+      margin-top: 12px;
+     overflow-y: auto;
+    }
+
+    .field-list {
+      margin-top: 10px;
+     display: flex;
+     flex-direction: column;
+     gap: 6px;
+    }
+
+    .field-list label {
+     font-size: 0.8rem;
+      display: flex;
+     gap: 8px;
+     align-items: center;
+    }
+
+    .export-actions {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+
+input, select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(10,14,40,0.8);
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+input::placeholder {
+  color: #9ca3af;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: #c7d2fe;
+  margin-bottom: 8px;
+}
+
+.inline input {
+  width: auto;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+/* Chips */
+.filter-card {
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(8,12,36,0.7);
+  margin-bottom: 12px;
+}
+
+.chips-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.clear-btn {
+  background: none;
+  border: none;
+  color: #93c5fd;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chip {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chip button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: white;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+button.primary {
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  color: white;
+}
+
+button.secondary {
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: transparent;
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+#status {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+  <div class="app-shell fade-in">
+    <div class="back-link-wrap">
+      <a href="/" class="back-link">
+        ⬅ Back to dashboard
+      </a>
+    </div>
+ <div class="container">
+
+<div class="header">
+  <h1>Career Site Job Listing API</h1>
+  <div class="subtitle">
+    Fetch high-quality ATS & career-site jobs with AI enrichment and CSV export
+  </div>
+</div>
+
+<form id="form">
+
+<!-- BASIC -->
+<div class="section">
+  <div class="section-title">BASIC SETTINGS</div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Time Range</label>
+      <select name="timeRange">
+        <option value="1h">Last 1 hour</option>
+        <option value="24h">Last 24 hours</option>
+        <option value="7d" selected>Last 7 days</option>
+        <option value="6m">Last 6 months (backfill)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Maximum Jobs</label>
+      <input type="number" name="limit" min="10" max="5000" value="50">
+    </div>
+  </div>
+
+  <div class="inline"><input type="checkbox" name="includeAi" checked> Include AI fields</div>
+  <div class="inline"><input type="checkbox" name="includeLinkedIn"> Include LinkedIn data</div>
+  <div class="inline"><input type="checkbox" name="removeAgency"> Remove agency jobs</div>
+  <div class="inline"><input type="checkbox" name="remote"> Remote only (legacy)</div>
+</div>
+
+<!-- SEARCH -->
+<div class="section">
+  <div class="section-title">SEARCH FILTERS</div>
+
+  <div class="filter-card" data-array="titleSearch">
+    <div class="chips-header">
+      <label>Title Search</label>
+      <button type="button" class="clear-btn">Clear</button>
+    </div>
+    <input placeholder="">
+    <div class="chips-container"></div>
+  </div>
+
+  <div class="filter-card" data-array="titleExclusionSearch">
+    <div class="chips-header">
+      <label>Title Exclusion Search</label>
+      <button type="button" class="clear-btn">Clear</button>
+    </div>
+    <input placeholder="">
+    <div class="chips-container"></div>
+  </div>
+
+  <div class="filter-card" data-array="locationSearch">
+    <div class="chips-header">
+      <label>Location Search</label>
+      <button type="button" class="clear-btn">Clear</button>
+    </div>
+    <input placeholder="">
+    <div class="chips-container"></div>
+  </div>
+
+  <div class="filter-card" data-array="locationExclusionSearch">
+    <div class="chips-header">
+      <label>Location Exclusion Search</label>
+      <button type="button" class="clear-btn">Clear</button>
+    </div>
+    <input placeholder="">
+    <div class="chips-container"></div>
+  </div>
+
+  <div class="filter-card" data-array="organizationSearch">
+    <div class="chips-header">
+      <label>Organization Search</label>
+      <button type="button" class="clear-btn">Clear</button>
+    </div>
+    <input placeholder="">
+    <div class="chips-container"></div>
+  </div>
+ </div>
+
+ <div class="filter-card" data-array="organizationExclusionSearch">
+    <div class="chips-header">
+      <label>Organization Exclusion Search</label>
+      <button type="button" class="clear-btn">Clear</button>
+    </div>
+    <input placeholder="">
+    <div class="chips-container"></div>
+  </div>
+
+  <div class="filter-card" data-array="descriptionSearch">
+    <div class="chips-header">
+      <label>Description Search</label>
+      <button type="button" class="clear-btn">Clear</button>
+    </div>
+    <input placeholder="">
+    <div class="chips-container"></div>
+  </div>
+
+  <div class="filter-card" data-array="descriptionExclusionSearch">
+    <div class="chips-header">
+      <label>Description Exclusion Search</label>
+      <button type="button" class="clear-btn">Clear</button>
+    </div>
+    <input placeholder="">
+    <div class="chips-container"></div>
+  </div>
+
+  <div class="filter-card" data-array="domainFilter">
+    <div class="chips-header">
+      <label>Domain Filter</label>
+      <button type="button" class="clear-btn">Clear</button>
+    </div>
+    <input placeholder="">
+    <div class="chips-container"></div>
+  </div>
+
+  <div class="filter-card" data-array="domainExclusionFilter">
+    <div class="chips-header">
+      <label>Domain Exclusion Filter</label>
+      <button type="button" class="clear-btn">Clear</button>
+    </div>
+    <input placeholder="">
+    <div class="chips-container"></div>
+  </div>
+
+<div class="section">
+  <div class="section-title">ATS Filters</div>
+
+  <!-- ATS -->
+  <div class="filter-card select-chip" data-array="ats">
+    <div class="chips-header">
+      <label>ATS</label>
+      <button type="button" class="chips-clear"
+        data-target-input=" chipState.ats"
+        data-target-chips="atsChips">
+        Clear all
+      </button>
+    </div>
+
+    <select id="atsPicker">
+      <option value="">Select ATS...</option>
+      <option value="adp">ADP</option>
+      <option value="applicantpro">ApplicantPro</option>
+      <option value="ashby">Ashby</option>
+      <option value="bamboohr">BambooHR</option>
+      <option value="breezy">Breezy</option>
+      <option value="careerplug">CareerPlug</option>
+      <option value="comeet">Comeet</option>
+      <option value="csod">CSOD</option>
+      <option value="dayforce">DayForce</option>
+      <option value="eightfold">EightFold</option>
+      <option value="freshteam">FreshTeam</option>
+      <option value="gem">Gem</option>
+      <option value="greenhouse">GreenHouse</option>
+      <option value="gohire">GoHire</option>
+      <option value="hirehive">HireHive</option>
+      <option value="hiringthing">HiringThing</option>
+      <option value="icims">iCIMS</option>
+      <option value="isolved">iSolved</option>
+      <option value="jazzhr">JazzHR</option>
+      <option value="jobvite">JobVite</option>
+      <option value="join.com">Join.com</option>
+      <option value="kula">Kula</option>
+      <option value="lever.co">Lever.co</option>
+      <option value="manatal">Manatal</option>
+      <option value="oraclecloud">OracleCloud</option>
+      <option value="paradox">Paradox</option>
+      <option value="paycom">Paycom</option>
+      <option value="paylocity">Paylocity</option>
+      <option value="personia">Personia</option>
+      <option value="phenompeople">PhenomPeople</option>
+      <option value="pinpoint">PinPoint</option>
+      <option value="polymer">Polymer</option>
+      <option value="recruitee">Recruitee</option>
+      <option value="recooty">Recooty</option>
+      <option value="rippling">Rippling</option>
+      <option value="smartrecruiters">SmartRecruiters</option>
+      <option value="successfactors">SuccessFactors</option>
+      <option value="taleo">Taleo</option>
+      <option value="teamtailor">Teamtailor</option>
+      <option value="trakstar">trakstar</option>
+      <option value="workable">Workable</option>
+      <option value="workday">Workday</option>
+      <option value="zoho">Zoho</option>
+    </select>
+
+    <div id="atsChips" class="chips-container"></div>
+    <input type="hidden" id="chipState.ats" name="chipState.ats" />
+  </div>
+
+  <!-- ATS Exclusion -->
+  <div class="filter-card select-chip" data-array="atsExclusionFilter">
+    <div class="chips-header">
+      <label>ATS Exclusion Filter</label>
+      <button type="button" class="chips-clear"
+        data-target-input="chipState.atsExclusionFilter"
+        data-target-chips="atsExclusionChips">
+        Clear all
+      </button>
+    </div>
+
+    <select id="atsExclusionPicker">
+      <option value="">Exclude ATS...</option>
+      <option value="adp">ADP</option>
+      <option value="applicantpro">ApplicantPro</option>
+      <option value="ashby">Ashby</option>
+      <option value="bamboohr">BambooHR</option>
+      <option value="breezy">Breezy</option>
+      <option value="careerplug">CareerPlug</option>
+      <option value="comeet">Comeet</option>
+      <option value="csod">CSOD</option>
+      <option value="dayforce">DayForce</option>
+      <option value="eightfold">EightFold</option>
+      <option value="freshteam">FreshTeam</option>
+      <option value="gem">Gem</option>
+      <option value="greenhouse">GreenHouse</option>
+      <option value="gohire">GoHire</option>
+      <option value="hirehive">HireHive</option>
+      <option value="hiringthing">HiringThing</option>
+      <option value="icims">iCIMS</option>
+      <option value="isolved">iSolved</option>
+      <option value="jazzhr">JazzHR</option>
+      <option value="jobvite">JobVite</option>
+      <option value="join.com">Join.com</option>
+      <option value="kula">Kula</option>
+      <option value="lever.co">Lever.co</option>
+      <option value="manatal">Manatal</option>
+      <option value="oraclecloud">OracleCloud</option>
+      <option value="paradox">Paradox</option>
+      <option value="paycom">Paycom</option>
+      <option value="paylocity">Paylocity</option>
+      <option value="personia">Personia</option>
+      <option value="phenompeople">PhenomPeople</option>
+      <option value="pinpoint">PinPoint</option>
+      <option value="polymer">Polymer</option>
+      <option value="recruitee">Recruitee</option>
+      <option value="recooty">Recooty</option>
+      <option value="rippling">Rippling</option>
+      <option value="smartrecruiters">SmartRecruiters</option>
+      <option value="successfactors">SuccessFactors</option>
+      <option value="taleo">Taleo</option>
+      <option value="teamtailor">Teamtailor</option>
+      <option value="trakstar">trakstar</option>
+      <option value="workable">Workable</option>
+      <option value="workday">Workday</option>
+      <option value="zoho">Zoho</option>
+    </select>
+
+    <div id="atsExclusionChips" class="chips-container"></div>
+    <input type="hidden" id="chipState.atsExclusionFilter" name="chipState.atsExclusionFilter" />
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">AI Filters</div>
+
+  <!-- Employment Type -->
+  <div class="filter-card select-chip" data-array="aiEmploymentTypeFilter">
+    <div class="chips-header">
+      <label>AI Employment Type</label>
+      <button type="button" class="chips-clear"
+        data-target-input="chipState.aiEmploymentTypeFilter"
+        data-target-chips="aiEmploymentTypeChips">
+        Clear all
+      </button>
+    </div>
+
+    <select id="aiEmploymentTypePicker">
+      <option value="">Select type...</option>
+      <option value="FULL_TIME">FULL_TIME</option>
+      <option value="PART_TIME">PART_TIME</option>
+      <option value="CONTRACTOR">CONTRACTOR</option>
+      <option value="TEMPORARY">TEMPORARY</option>
+      <option value="INTERN">INTERN</option>
+      <option value="VOLUNTEER">VOLUNTEER</option>
+      <option value="PER_DIEM">PER_DIEM</option>
+      <option value="OTHER">OTHER</option>
+    </select>
+
+    <div id="aiEmploymentTypeChips" class="chips-container"></div>
+    <input type="hidden" id="chipState.aiEmploymentTypeFilter" name="chipState.aiEmploymentTypeFilter" />
+  </div>
+
+  <!-- Work Arrangement -->
+  <div class="filter-card select-chip" data-array="aiWorkArrangementFilter">
+    <div class="chips-header">
+      <label>AI Work Arrangement</label>
+      <button type="button" class="chips-clear"
+        data-target-input="chipState.aiWorkArrangementFilter"
+        data-target-chips="aiWorkArrangementChips">
+        Clear all
+      </button>
+    </div>
+
+    <select id="aiWorkArrangementPicker">
+      <option value="">Select arrangement...</option>
+      <option value="On-site">On-site</option>
+      <option value="Hybrid">Hybrid</option>
+      <option value="Remote OK">Remote OK</option>
+      <option value="Remote Solely">Remote Solely</option>
+    </select>
+
+    <div id="aiWorkArrangementChips" class="chips-container"></div>
+    <input type="hidden" id="chipState.aiWorkArrangementFilter" name="chipState.aiWorkArrangementFilter" />
+  </div>
+
+  <!-- Experience -->
+  <div class="filter-card select-chip" data-array="aiExperienceLevelFilter">
+    <div class="chips-header">
+      <label>AI Experience Level</label>
+      <button type="button" class="chips-clear"
+        data-target-input="chipState.aiExperienceLevelFilter"
+        data-target-chips="aiExperienceLevelChips">
+        Clear all
+      </button>
+    </div>
+
+    <select id="aiExperienceLevelPicker">
+      <option value="">Select range...</option>
+      <option value="0-2">0-2</option>
+      <option value="2-5">2-5</option>
+      <option value="5-10">5-10</option>
+      <option value="10+">10+</option>
+    </select>
+
+    <div id="aiExperienceLevelChips" class="chips-container"></div>
+    <input type="hidden" id="chipState.aiExperienceLevelFilter" name="chipState.aiExperienceLevelFilter" />
+  </div>
+
+ <div class="filter-card select-chip" data-array="aiTaxonomiesFilter">
+    <div class="chips-header">
+      <label>AI Taxonomies Filter</label>
+      <button type="button" class="chips-clear"
+        data-target-input="chipState.aiTaxonomiesFilter"
+        data-target-chips="aiTaxonomiesChips">
+        Clear all
+      </button>
+    </div>
+
+    <select id="aiTaxonomiesPicker">
+      <option value="">Select...</option>
+      <option value="Technology">Technology</option>
+      <option value="Healthcare">Healthcare</option>
+      <option value="Management & Leadership">Management & Leadership</option>
+      <option value="Finance & Accounting">Finance & Accounting</option>
+      <option value="Human Resources">Human Resources</option>
+      <option value="Sales">Sales</option>
+      <option value="Marketing">Marketing</option>
+      <option value="Customer Service & Support">Customer Service & Support</option>
+      <option value="Education">Education</option>
+      <option value="Legal">Legal</option>
+      <option value="Engineering">Engineering</option>
+      <option value="Science & Research">Science & Research</option>
+      <option value="Trades">Trades</option>
+      <option value="Construction">Construction</option>
+      <option value="Manufacturing">Manufacturing</option>
+      <option value="Logistics">Logistics</option>
+      <option value="Creative & Media">Creative & Media</option>
+      <option value="Hospitality">Hospitality</option>
+      <option value="Environment & Sustainablity">Environment & Sustainablity</option>
+      <option value="Retail">Retail</option>
+      <option value="Data & Analytics">Data & Analytics</option>
+      <option value="Software">Software</option>
+      <option value="Energy">Energy</option>
+      <option value="Agriculture">Agriculture</option>
+      <option value="Social Services">Social Services</option>
+      <option value="Administrative">Administrative</option>
+      <option value="Government & Public Sector">Government & Public Sector</option>
+      <option value="Art & Design">Art & Design</option>
+      <option value="Food & Beverage">Food & Beverage</option>
+      <option value="Transportation">Transportation</option>
+      <option value="Consulting">Consulting</option>
+      <option value="Sports & Recreation">Sports & Recreation</option>
+      <option value="Security & Safety">Security & Safety</option>
+    </select>
+
+    <div id="aiTaxonomiesChips" class="chips-container"></div>
+    <input type="hidden" id="chipState.aiTaxonomiesFilter" name="chipState.aiTaxonomiesFilter" />
+  </div>
+
+ <div class="filter-card select-chip" data-array="aiTaxonomiesPrimaryFilter">
+    <div class="chips-header">
+      <label>AI Taxonomies Primary</label>
+      <button type="button" class="chips-clear"
+        data-target-input="chipState.aiTaxonomiesPrimaryFilter"
+        data-target-chips="aiTaxonomiesPrimaryChips">
+        Clear all
+      </button>
+    </div>
+
+    <select id="aiTaxonomiesPrimaryPicker">
+      <option value="">Select...</option>
+      <option value="Technology">Technology</option>
+      <option value="Healthcare">Healthcare</option>
+      <option value="Management & Leadership">Management & Leadership</option>
+      <option value="Finance & Accounting">Finance & Accounting</option>
+      <option value="Human Resources">Human Resources</option>
+      <option value="Sales">Sales</option>
+      <option value="Marketing">Marketing</option>
+      <option value="Customer Service & Support">Customer Service & Support</option>
+      <option value="Education">Education</option>
+      <option value="Legal">Legal</option>
+      <option value="Engineering">Engineering</option>
+      <option value="Science & Research">Science & Research</option>
+      <option value="Trades">Trades</option>
+      <option value="Construction">Construction</option>
+      <option value="Manufacturing">Manufacturing</option>
+      <option value="Logistics">Logistics</option>
+      <option value="Creative & Media">Creative & Media</option>
+      <option value="Hospitality">Hospitality</option>
+      <option value="Environment & Sustainablity">Environment & Sustainablity</option>
+      <option value="Retail">Retail</option>
+      <option value="Data & Analytics">Data & Analytics</option>
+      <option value="Software">Software</option>
+      <option value="Energy">Energy</option>
+      <option value="Agriculture">Agriculture</option>
+      <option value="Social Services">Social Services</option>
+      <option value="Administrative">Administrative</option>
+      <option value="Government & Public Sector">Government & Public Sector</option>
+      <option value="Art & Design">Art & Design</option>
+      <option value="Food & Beverage">Food & Beverage</option>
+      <option value="Transportation">Transportation</option>
+      <option value="Consulting">Consulting</option>
+      <option value="Sports & Recreation">Sports & Recreation</option>
+      <option value="Security & Safety">Security & Safety</option>
+    </select>
+
+    <div id="aiTaxonomiesPrimaryChips" class="chips-container"></div>
+    <input type="hidden" id="chipState.aiTaxonomiesPrimaryFilter" name="chipState.aiTaxonomiesPrimaryFilter" />
+  </div>
+
+ <div class="filter-card select-chip" data-array="aiTaxonomiesExclusionFilter">
+    <div class="chips-header">
+      <label>AI Taxonomies Exclusion</label>
+      <button type="button" class="chips-clear"
+        data-target-input="chipState.aiTaxonomiesExclusionFilter"
+        data-target-chips="aiTaxonomiesExclusionChips">
+        Clear all
+      </button>
+    </div>
+
+    <select id="aiTaxonomiesExclusionPicker">
+      <option value="">Select...</option>
+      <option value="Technology">Technology</option>
+      <option value="Healthcare">Healthcare</option>
+      <option value="Management & Leadership">Management & Leadership</option>
+      <option value="Finance & Accounting">Finance & Accounting</option>
+      <option value="Human Resources">Human Resources</option>
+      <option value="Sales">Sales</option>
+      <option value="Marketing">Marketing</option>
+      <option value="Customer Service & Support">Customer Service & Support</option>
+      <option value="Education">Education</option>
+      <option value="Legal">Legal</option>
+      <option value="Engineering">Engineering</option>
+      <option value="Science & Research">Science & Research</option>
+      <option value="Trades">Trades</option>
+      <option value="Construction">Construction</option>
+      <option value="Manufacturing">Manufacturing</option>
+      <option value="Logistics">Logistics</option>
+      <option value="Creative & Media">Creative & Media</option>
+      <option value="Hospitality">Hospitality</option>
+      <option value="Environment & Sustainablity">Environment & Sustainablity</option>
+      <option value="Retail">Retail</option>
+      <option value="Data & Analytics">Data & Analytics</option>
+      <option value="Software">Software</option>
+      <option value="Energy">Energy</option>
+      <option value="Agriculture">Agriculture</option>
+      <option value="Social Services">Social Services</option>
+      <option value="Administrative">Administrative</option>
+      <option value="Government & Public Sector">Government & Public Sector</option>
+      <option value="Art & Design">Art & Design</option>
+      <option value="Food & Beverage">Food & Beverage</option>
+      <option value="Transportation">Transportation</option>
+      <option value="Consulting">Consulting</option>
+      <option value="Sports & Recreation">Sports & Recreation</option>
+      <option value="Security & Safety">Security & Safety</option>
+    </select>
+
+    <div id="aiTaxonomiesExclusionChips" class="chips-container"></div>
+    <input type="hidden" id="chipState.aiTaxonomiesExclusionFilter" name="chipState.aiTaxonomiesExclusionFilter" />
+  </div>
+</div>
+
+<!-- ACTIONS -->
+<div class="actions">
+  <button type="submit" class="primary">Run Actor</button>
+  <button type="button" class="secondary" id="exportBtn" disabled>Export CSV</button>
+  <span id="status"></span>
+</div>
+
+
+<div id="exportModal" class="export-modal hidden">
+      <div class="export-card">
+           <div class="export-header">
+             <h3>Export dataset</h3>
+             <button id="closeExport">✕</button>
+           </div>
+
+         <div class="export-body">
+           <label class="checkbox">
+           <input type="checkbox" id="selectAllFields" checked />
+             Export all fields
+            </label>
+
+            <div id="fieldList" class="field-list"></div>
+          </div>
+
+         <div class="export-actions">
+           <button id="confirmExport" class="primary">Export CSV</button>
+         </div>
+     </div>
+    </div>
+
+<div class="section">
+  <div class="section-title">RESULTS</div>
+  <div id="results"></div>
+</div>
+
+</form>
+</div>
+
+<script>
+const form = document.getElementById("form");
+const statusEl = document.getElementById("status");
+const exportBtn = document.getElementById("exportBtn");
+const resultsEl = document.getElementById("results");
+
+let lastItems = [];
+
+/* ================================
+   TEXT INPUT → CHIPS (Enter key)
+================================ */
+document.querySelectorAll(".filter-card[data-array]").forEach(card => {
+  const input = card.querySelector("input");
+  const chips = card.querySelector(".chips-container");
+  const clearBtn = card.querySelector(".clear-btn");
+
+  if (!input) return;
+
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+
+    const val = input.value.trim();
+    if (!val) return;
+
+    addChip(chips, val);
+    input.value = "";
+  });
+
+  if (clearBtn) {
+    clearBtn.onclick = () => chips.innerHTML = "";
+  }
+});
+
+/* ================================
+   SELECT → CHIPS (MULTI)
+================================ */
+function bindSelectToChips(selectId, chipsId) {
+  const select = document.getElementById(selectId);
+  const chips = document.getElementById(chipsId);
+  if (!select || !chips) return;
+
+  select.addEventListener("change", () => {
+    const val = select.value;
+    if (!val) return;
+
+    const exists = [...chips.children]
+      .some(c => c.dataset.value === val);
+
+    if (!exists) addChip(chips, val);
+    select.value = "";
+  });
+}
+
+function addChip(container, value) {
+  const chip = document.createElement("span");
+  chip.className = "chip";
+  chip.dataset.value = value;
+  chip.innerHTML = `${value} <button type="button">×</button>`;
+  chip.querySelector("button").onclick = () => chip.remove();
+  container.appendChild(chip);
+}
+
+/* Bind all dropdowns */
+bindSelectToChips("atsPicker", "atsChips");
+bindSelectToChips("atsExclusionPicker", "atsExclusionChips");
+bindSelectToChips("aiEmploymentTypePicker", "aiEmploymentTypeChips");
+bindSelectToChips("aiWorkArrangementPicker", "aiWorkArrangementChips");
+bindSelectToChips("aiExperienceLevelPicker", "aiExperienceLevelChips");
+bindSelectToChips("aiTaxonomiesPicker", "aiTaxonomiesChips");
+bindSelectToChips("aiTaxonomiesPrimaryPicker", "aiTaxonomiesPrimaryChips");
+bindSelectToChips("aiTaxonomiesExclusionPicker", "aiTaxonomiesExclusionChips");
+
+/* ================================
+   SUBMIT → BUILD EXACT APIFY INPUT
+================================ */
+form.onsubmit = async e => {
+  e.preventDefault();
+  statusEl.textContent = "Running actor…";
+  exportBtn.disabled = true;
+  lastItems = [];
+
+  const data = {};
+  const fd = new FormData(form);
+
+  /* Simple fields only */
+  for (const [k, v] of fd.entries()) {
+    if (v === "") continue;
+    if (v === "on") data[k] = true;
+    else if (!isNaN(v)) data[k] = Number(v);
+    else data[k] = v;
+  }
+
+  /* Chip fields (schema-aligned) */
+  document.querySelectorAll(".filter-card[data-array]").forEach(card => {
+    const key = card.dataset.array;
+    const values = [...card.querySelectorAll(".chip")]
+      .map(c => c.dataset.value);
+
+    if (values.length) data[key] = values;
+  });
+
+  /* Cleanup empty arrays */
+  Object.keys(data).forEach(k => {
+    if (Array.isArray(data[k]) && data[k].length === 0) {
+      delete data[k];
+    }
+  });
+
+  console.log("FINAL INPUT SENT TO APIFY:", JSON.stringify(data, null, 2));
+
+  const res = await fetch("/api/run", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      scraper: "careersitejoblistingfeed",
+      input: data
+    })
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    statusEl.textContent = "Error running actor";
+    return;
+  }
+
+  lastItems = Array.isArray(result) ? result : (result.items || []);
+  statusEl.textContent = `Completed • ${lastItems.length} jobs`;
+  exportBtn.disabled = lastItems.length === 0;
+
+  renderResults(lastItems);
+};
+
+/* ================================
+   RESULTS
+================================ */
+function renderResults(items) {
+  resultsEl.innerHTML = "";
+  items.slice(0, 20).forEach(job => {
+    const div = document.createElement("div");
+    div.className = "job-card";
+    div.innerHTML = `
+      <div class="job-title">${job.title || "Untitled"}</div>
+      <div class="job-meta">
+        ${job.organization || "Unknown"} • ${(job.locations_derived || []).join(", ")}
+      </div>
+      <a href="${job.url}" target="_blank">View job</a>
+    `;
+    resultsEl.appendChild(div);
+  });
+}
+
+const exportModal = document.getElementById("exportModal");
+const fieldList = document.getElementById("fieldList");
+const selectAllFields = document.getElementById("selectAllFields");
+const confirmExport = document.getElementById("confirmExport");
+const closeExport = document.getElementById("closeExport");
+
+/* Open export modal */
+exportBtn.onclick = () => {
+  if (!lastItems.length) return;
+
+  exportModal.classList.remove("hidden");
+
+  const fields = Array.from(
+    new Set(lastItems.flatMap(item => Object.keys(item)))
+  ).sort();
+
+  fieldList.innerHTML = "";
+
+  fields.forEach(field => {
+    const label = document.createElement("label");
+    label.innerHTML = `
+      <input type="checkbox" value="${field}" checked />
+      ${field}
+    `;
+    fieldList.appendChild(label);
+  });
+
+  selectAllFields.checked = true;
+};
+
+/* Select / deselect all */
+selectAllFields.onchange = () => {
+  fieldList
+    .querySelectorAll("input[type='checkbox']")
+    .forEach(cb => (cb.checked = selectAllFields.checked));
+};
+
+/* Close modal */
+closeExport.onclick = () => {
+  exportModal.classList.add("hidden");
+};
+
+/* Confirm export */
+confirmExport.onclick = () => {
+  const selected = [...fieldList.querySelectorAll("input:checked")]
+    .map(cb => cb.value);
+
+  if (!selected.length) {
+    alert("Select at least one field to export");
+    return;
+  }
+
+  downloadCSV(lastItems, selected);
+  exportModal.classList.add("hidden");
+};
+
+/* CSV generator */
+function downloadCSV(items, fields) {
+  const rows = [
+    fields.join(","),
+    ...items.map(item =>
+      fields
+        .map(f => `"${String(item[f] ?? "").replace(/"/g, '""')}"`)
+        .join(",")
+    )
+  ];
+
+  const blob = new Blob([rows.join("\n")], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "career_site_jobs.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+</script>
+
+
+</body>
+</html>
