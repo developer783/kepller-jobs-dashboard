@@ -20,21 +20,27 @@ export async function POST(req) {
       );
     }
 
-    // ✅ Initialize INSIDE function
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    console.log("▶ Running actor:", ACTORS[scraper]);
+    console.log("▶ Input:", input);
 
-    const client = new ApifyClient({
-      token: process.env.APIFY_TOKEN,
-    });
+    const datasetId = run.defaultDatasetId;
 
-    const run = await client.actor(ACTORS[scraper]).call(input);
+    if (!run?.defaultDatasetId) {
+      return NextResponse.json(
+        { error: "Actor run failed (no dataset)" },
+        { status: 500 }
+      );
+    }
 
-    return NextResponse.json({ success: true, run });
-  } catch (error) {
-    console.error(error);
+    const { items } = await client
+      .dataset(run.defaultDatasetId)
+      .listItems({ clean: true });
+
+    return NextResponse.json(items);
+
+  } catch (err) {
+    console.error("🔥 API ERROR:", err);
+
     return NextResponse.json(
       { error: "Something failed" },
       { status: 500 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 export default function ResetPasswordPage() {
   return (
     <div style={{ padding: "20px" }}>
@@ -6,3 +7,14 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
+=======
+"use client";
+
+export default function ResetPasswordPage() {
+  return (
+    <div>
+      <h1>Reset Password</h1>
+    </div>
+  );
+}
+>>>>>>> 022b123 (Fix actor dataset fetch and normalization)
