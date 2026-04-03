@@ -27,8 +27,9 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  // Protect dashboard
-  if (!session && request.nextUrl.pathname === "/") {
+  const protectedPaths = ["/", "/saved-tasks"];
+
+  if (!session && protectedPaths.includes(request.nextUrl.pathname)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -36,6 +37,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/"],
+  matcher: ["/", "/saved-tasks"],
 };
 
