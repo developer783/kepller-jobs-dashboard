@@ -73,8 +73,7 @@ export default async function SavedTasksPage() {
             Saved Tasks
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-yellow-100/70 md:text-base">
-            This page reads live from your Apify saved tasks, so the dashboard reflects
-            the same task definitions currently stored in Apify.
+            This page reads live from your Apify saved tasks.
           </p>
         </div>
 
