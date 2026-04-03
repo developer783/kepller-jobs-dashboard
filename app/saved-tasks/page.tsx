@@ -1,5 +1,6 @@
 import { ApifyClient, type Task } from "apify-client";
 import GoldBackground from "@/components/GoldBackground";
+import RunSavedTaskButton from "@/components/RunSavedTaskButton";
 import Sidebar from "@/components/Sidebar";
 
 export const dynamic = "force-dynamic";
@@ -110,10 +111,14 @@ export default async function SavedTasksPage() {
                   ) : null}
                 </div>
 
-                <div className="grid gap-2 text-sm text-yellow-100/80 md:text-right">
-                  <span>Runs: {task.stats?.totalRuns ?? 0}</span>
-                  <span>Created: {formatDate(task.createdAt)}</span>
-                  <span>Updated: {formatDate(task.modifiedAt)}</span>
+                <div className="flex flex-col gap-4 md:items-end">
+                  <div className="grid gap-2 text-sm text-yellow-100/80 md:text-right">
+                    <span>Runs: {task.stats?.totalRuns ?? 0}</span>
+                    <span>Created: {formatDate(task.createdAt)}</span>
+                    <span>Updated: {formatDate(task.modifiedAt)}</span>
+                  </div>
+
+                  <RunSavedTaskButton taskId={task.id} />
                 </div>
               </div>
 
