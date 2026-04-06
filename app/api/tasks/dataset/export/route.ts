@@ -98,7 +98,7 @@ export async function GET(request: Request) {
 
     const fileName = `apify-dataset-${datasetId}.${getFileExtension(format)}`;
 
-    return new NextResponse(buffer, {
+    return new NextResponse(new Uint8Array(buffer), {
       headers: {
         "Content-Type": getContentType(format),
         "Content-Disposition":
