@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 type SavedTaskExportModalProps = {
   datasetId: string;
@@ -37,6 +38,7 @@ export default function SavedTaskExportModal({
   isOpen,
   onClose,
 }: SavedTaskExportModalProps) {
+  const [isMounted, setIsMounted] = useState(false);
   const [format, setFormat] = useState<ExportFormat>("json");
   const [view, setView] = useState<ExportView>("overview");
   const [meta, setMeta] = useState<DatasetMeta | null>(null);
@@ -51,6 +53,27 @@ export default function SavedTaskExportModal({
   const [copied, setCopied] = useState(false);
   const [isLoadingMeta, setIsLoadingMeta] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+
+    return () => {
+      setIsMounted(false);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted || !isOpen) {
+      return;
+    }
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isMounted, isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -185,7 +208,11 @@ export default function SavedTaskExportModal({
   function openInNewTab() {
     const params = new URLSearchParams(exportQuery);
     params.set("mode", "view");
-    window.open(`/api/tasks/dataset/export?${params.toString()}`, "_blank", "noopener,noreferrer");
+    window.open(
+      `/api/tasks/dataset/export?${params.toString()}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
   }
 
   function download() {
@@ -194,12 +221,12 @@ export default function SavedTaskExportModal({
     window.location.href = `/api/tasks/dataset/export?${params.toString()}`;
   }
 
-  if (!isOpen) {
+  if (!isMounted || !isOpen) {
     return null;
   }
 
-  return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/70 px-4 py-10 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 px-4 py-10 backdrop-blur-sm">
       <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[28px] border border-white/15 bg-[#f7f4ef] text-[#1b1b1b] shadow-2xl">
         <div className="flex items-center justify-between border-b border-[#ded8ce] px-6 py-5">
           <div className="flex min-w-0 items-center gap-3">
@@ -215,7 +242,7 @@ export default function SavedTaskExportModal({
             className="rounded-full p-2 text-2xl text-[#4c4a45] transition hover:bg-black/5"
             aria-label="Close export modal"
           >
-            ×
+            x
           </button>
         </div>
 
@@ -414,6 +441,7 @@ export default function SavedTaskExportModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
