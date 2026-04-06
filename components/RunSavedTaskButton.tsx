@@ -47,7 +47,9 @@ export default function RunSavedTaskButton({
   }, [run]);
 
   useEffect(() => {
-    if (!run?.runId || isTerminal) {
+    const runId = run?.runId;
+
+    if (!runId || isTerminal) {
       return;
     }
 
@@ -56,7 +58,7 @@ export default function RunSavedTaskButton({
     async function fetchRunStatus() {
       try {
         const response = await fetch(
-          `/api/tasks/run-status?runId=${encodeURIComponent(run.runId)}`
+          `/api/tasks/run-status?runId=${encodeURIComponent(runId)}`
         );
         const data = (await response.json()) as RunStatusResponse & { error?: string };
 
