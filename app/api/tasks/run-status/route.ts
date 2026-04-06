@@ -1,7 +1,7 @@
 import { ApifyClient } from "apify-client";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   try {
     const token = process.env.APIFY_TOKEN;
 
@@ -12,27 +12,30 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json();
-    const taskId =
-      typeof body?.taskId === "string" ? body.taskId.trim() : "";
+    const { searchParams } = new URL(request.url);
+    const runId = searchParams.get("runId")?.trim() || "";
 
-    if (!taskId) {
+    if (!runId) {
       return NextResponse.json(
-        { error: "A valid taskId is required." },
+        { error: "A valid runId is required." },
         { status: 400 }
       );
     }
 
     const client = new ApifyClient({ token });
-    const run = await client.task(taskId).start();
+    const run = await client.run(runId).get();
+
+    if (!run) {
+      return NextResponse.json({ error: "Run not found." }, { status: 404 });
+    }
 
     return NextResponse.json({
-      success: true,
       runId: run.id,
       status: run.status,
+      statusMessage: run.statusMessage,
       startedAt: run.startedAt,
+      finishedAt: run.finishedAt,
       defaultDatasetId: run.defaultDatasetId,
-      taskId,
     });
   } catch (error) {
     return NextResponse.json(
@@ -40,7 +43,7 @@ export async function POST(request: Request) {
         error:
           error instanceof Error
             ? error.message
-            : "Failed to start the Apify task.",
+            : "Failed to fetch the Apify run status.",
       },
       { status: 500 }
     );
