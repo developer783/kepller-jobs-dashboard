@@ -53,12 +53,14 @@ export default function RunSavedTaskButton({
       return;
     }
 
+    const activeRunId: string = runId;
+
     let cancelled = false;
 
     async function fetchRunStatus() {
       try {
         const response = await fetch(
-          `/api/tasks/run-status?runId=${encodeURIComponent(runId)}`
+          `/api/tasks/run-status?runId=${encodeURIComponent(activeRunId)}`
         );
         const data = (await response.json()) as RunStatusResponse & { error?: string };
 
